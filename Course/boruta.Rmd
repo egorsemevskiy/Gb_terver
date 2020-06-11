@@ -1,0 +1,41 @@
+---
+title: "boruta for TerVer"
+output: html_notebook
+---
+
+```{r}
+require(tidyverse)
+require(psych)
+require(flextable)
+library(scales)
+require(Boruta)
+require(caret)
+
+```
+
+```{r}
+df <- read.csv("winequality-red.csv", sep = ';')
+```
+
+```{r}
+set.seed(42)
+
+boruta_credit <- Boruta(quality ~ . ,
+                        data = df,
+                        doTrace = 2, 
+                        ntree = 300,
+                         maxRuns = 50)
+
+```
+
+```{r}
+plot(boruta_credit, xlab = "", xaxt = "n")
+
+lz <- lapply(1:ncol(boruta_credit$ImpHistory),function(i)
+  boruta_credit$ImpHistory[is.finite(boruta_credit$ImpHistory[,i]),i])
+  names(lz) <- colnames(boruta_credit$ImpHistory)
+  Labels <- sort(sapply(lz,median))
+  axis(side = 1,las=2,labels = names(Labels),
+  at = 1:ncol(boruta_credit$ImpHistory), cex.axis = 0.7)
+  
+```
